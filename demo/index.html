@@ -1,0 +1,673 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Notificate.js — lightweight toast and popup notifications for the web."
+    >
+
+    <title>Notificate.js — Toast & Popup Notifications</title>
+
+    <style>
+        :root {
+            color-scheme: light dark;
+
+            --page-bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-soft: #f1f5f9;
+
+            --text: #0f172a;
+            --muted: #64748b;
+
+            --border: #e2e8f0;
+
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+
+            --radius: 14px;
+            --shadow:
+                0 10px 30px rgba(15, 23, 42, 0.06),
+                0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+
+            color: var(--text);
+            background: var(--page-bg);
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .container {
+            width: min(960px, calc(100% - 32px));
+            margin-inline: auto;
+        }
+
+        .site-header {
+            border-bottom: 1px solid var(--border);
+            background: color-mix(
+                in srgb,
+                var(--page-bg) 88%,
+                transparent
+            );
+        }
+
+        .site-header-inner {
+            min-height: 68px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            color: var(--text);
+            text-decoration: none;
+
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .site-nav a {
+            color: var(--muted);
+            text-decoration: none;
+
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+
+        .site-nav a:hover {
+            color: var(--text);
+        }
+
+        .hero {
+            padding-block: 72px 56px;
+        }
+
+        .hero-badge {
+            width: fit-content;
+
+            margin-bottom: 18px;
+            padding: 6px 10px;
+
+            border: 1px solid var(--border);
+            border-radius: 999px;
+
+            color: var(--primary);
+            background: var(--surface);
+
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .hero h1 {
+            max-width: 720px;
+
+            margin: 0;
+
+            font-size: clamp(2.4rem, 7vw, 4.5rem);
+            line-height: 1;
+            letter-spacing: -0.055em;
+        }
+
+        .hero p {
+            max-width: 660px;
+
+            margin: 24px 0 0;
+
+            color: var(--muted);
+
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            margin-top: 28px;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            min-height: 44px;
+            padding: 10px 16px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            color: var(--text);
+            background: var(--surface);
+
+            text-decoration: none;
+
+            font-size: 0.9rem;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: var(--surface-soft);
+        }
+
+        .button-primary {
+            color: #ffffff;
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .button-primary:hover {
+            border-color: var(--primary-hover);
+            background: var(--primary-hover);
+        }
+
+        .install {
+            margin-top: 32px;
+            max-width: 560px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            padding: 13px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            color: var(--code-text);
+            background: var(--code-bg);
+
+            box-shadow: var(--shadow);
+        }
+
+        .install code {
+            overflow-x: auto;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 0.875rem;
+        }
+
+        .section {
+            padding-block: 42px;
+        }
+
+        .section + .section {
+            border-top: 1px solid var(--border);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            margin: 0 0 6px;
+
+            font-size: 1.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .section-header p {
+            margin: 0;
+
+            color: var(--muted);
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .examples button {
+            min-height: 42px;
+            padding: 9px 15px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            color: var(--text);
+            background: var(--surface);
+
+            font-weight: 650;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.15s ease,
+                border-color 0.15s ease,
+                transform 0.15s ease;
+        }
+
+        .examples button:hover {
+            background: var(--surface-soft);
+        }
+
+        .examples button:active {
+            transform: translateY(1px);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .feature-card {
+            padding: 18px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-card span {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-block: 28px;
+
+            border-top: 1px solid var(--border);
+
+            color: var(--muted);
+
+            font-size: 0.875rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer a {
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--text);
+        }
+
+        @media (max-width: 720px) {
+            .site-nav {
+                gap: 12px;
+            }
+
+            .site-nav .optional-link {
+                display: none;
+            }
+
+            .hero {
+                padding-block: 52px 40px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --page-bg: #0f172a;
+                --surface: #111827;
+                --surface-soft: #1e293b;
+
+                --text: #f3f4f6;
+                --muted: #94a3b8;
+
+                --border: #273449;
+
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+
+                --code-bg: #020617;
+                --code-text: #e2e8f0;
+
+                --shadow:
+                    0 12px 32px rgba(0, 0, 0, 0.16),
+                    0 2px 8px rgba(0, 0, 0, 0.12);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container site-header-inner">
+        <a
+            href="./"
+            class="brand"
+        >
+            Notificate<span>.js</span>
+        </a>
+
+        <nav class="site-nav">
+            <a href="#toast">
+                Toast
+            </a>
+
+            <a href="#popup">
+                Popup
+            </a>
+
+            <a
+                class="optional-link"
+                href="https://www.npmjs.com/package/notificate.js"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                npm
+            </a>
+
+            <a
+                href="https://github.com/erilshackle/notificate.js"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                GitHub
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="hero">
+        <div class="hero-badge">
+            v0.1.0
+        </div>
+
+        <h1>
+            Simple notifications for the web.
+        </h1>
+
+        <p>
+            Lightweight toast and popup notifications with built-in
+            TypeScript support, Promise-based interactions, automatic
+            light and dark mode, and no UI dependencies.
+        </p>
+
+        <div class="hero-actions">
+            <a
+                href="#toast"
+                class="button button-primary"
+            >
+                Try the demo
+            </a>
+
+            <a
+                href="https://github.com/erilshackle/notificate.js"
+                class="button"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                View on GitHub
+            </a>
+        </div>
+
+        <div class="install">
+            <code>npm install notificate.js</code>
+        </div>
+        <div class="install">
+            <code>
+                &lt;script src="https://www.npmjs.com/package/notificate.js/dist@lateest"&gt;&lt;/script&gt;
+            </code>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="feature-grid">
+            <article class="feature-card">
+                <strong>Dependency-free</strong>
+
+                <span>
+                    No Bootstrap, icon library or UI framework required.
+                </span>
+            </article>
+
+            <article class="feature-card">
+                <strong>Promise-based</strong>
+
+                <span>
+                    Await toast actions and popup confirmations naturally.
+                </span>
+            </article>
+
+            <article class="feature-card">
+                <strong>Light & dark</strong>
+
+                <span>
+                    Automatically follows the user's preferred color scheme.
+                </span>
+            </article>
+        </div>
+    </section>
+
+    <section
+        id="toast"
+        class="section"
+    >
+        <div class="section-header">
+            <h2>Toast</h2>
+
+            <p>
+                Try each notification type.
+            </p>
+        </div>
+
+        <div class="examples">
+            <button id="toast-success">
+                Success
+            </button>
+
+            <button id="toast-error">
+                Error
+            </button>
+
+            <button id="toast-warning">
+                Warning
+            </button>
+
+            <button id="toast-info">
+                Info
+            </button>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Toast variations</h2>
+
+            <p>
+                Actions, persistence, progress and icon options.
+            </p>
+        </div>
+
+        <div class="examples">
+            <button id="toast-action">
+                With action
+            </button>
+
+            <button id="toast-persistent">
+                Persistent
+            </button>
+
+            <button id="toast-no-progress">
+                No progress
+            </button>
+
+            <button id="toast-no-icon">
+                No icon
+            </button>
+
+            <button id="toast-multiple">
+                Multiple
+            </button>
+        </div>
+    </section>
+
+    <section
+        id="popup"
+        class="section"
+    >
+        <div class="section-header">
+            <h2>Popup</h2>
+
+            <p>
+                Confirmation dialogs using the same notification types.
+            </p>
+        </div>
+
+        <div class="examples">
+            <button id="popup-success">
+                Success
+            </button>
+
+            <button id="popup-error">
+                Error
+            </button>
+
+            <button id="popup-warning">
+                Warning
+            </button>
+
+            <button id="popup-info">
+                Info
+            </button>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Popup variations</h2>
+
+            <p>
+                Test different interaction and dismissal modes.
+            </p>
+        </div>
+
+        <div class="examples">
+            <button id="popup-no-icon">
+                No icon
+            </button>
+
+            <button id="popup-strict">
+                Required confirmation
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <span>
+            Notificate.js · MIT License
+        </span>
+
+        <div class="footer-links">
+            <a
+                href="https://github.com/erilshackle/notificate.js"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                GitHub
+            </a>
+
+            <a
+                href="https://www.npmjs.com/package/notificate.js"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                npm
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script
+    type="module"
+    src="/demo/main.ts"
+></script>
+
+</body>
+</html>
