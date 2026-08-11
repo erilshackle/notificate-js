@@ -1,4 +1,4 @@
-import { Notificate } from './index';
+import { Notificate } from '../src';
 
 /**
  * Returns an element by its ID.

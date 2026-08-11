@@ -1,4 +1,6 @@
-import './notificate.css';
+import { injectStyles } from './style';
+
+injectStyles();
 
 export { Notificate } from './Notificate';
 
