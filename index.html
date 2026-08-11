@@ -10,24 +10,138 @@
     >
 
     <title>Notificate Playground</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+
+            color: #1f2937;
+            background: #f8fafc;
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        main {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            margin-top: 36px;
+        }
+
+        p {
+            color: #64748b;
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .examples button {
+            padding: 10px 16px;
+
+            border: 1px solid #dbe1e8;
+            border-radius: 10px;
+
+            color: #1f2937;
+            background: #ffffff;
+
+            font: inherit;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .examples button:hover {
+            background: #f1f5f9;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #f3f4f6;
+                background: #0f172a;
+            }
+
+            p {
+                color: #94a3b8;
+            }
+
+            .examples button {
+                color: #f3f4f6;
+                background: #1e293b;
+                border-color: #334155;
+            }
+
+            .examples button:hover {
+                background: #334155;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
+<main>
     <h1>Notificate</h1>
 
-    <button id="toast">
-        Toast com botão
-    </button>
+    <p>
+        Playground para testar notificações e popups.
+    </p>
 
-    <button id="toast-simple">
-        Toast simples
-    </button>
+    <h2>Toast</h2>
 
-    <script
-        type="module"
-        src="/src/main.ts"
-    ></script>
+    <div class="examples">
+        <button id="toast-success">Success</button>
+        <button id="toast-error">Error</button>
+        <button id="toast-warning">Warning</button>
+        <button id="toast-info">Info</button>
+    </div>
+
+    <h2>Toast — variações</h2>
+
+    <div class="examples">
+        <button id="toast-action">Com ação</button>
+        <button id="toast-persistent">Persistente</button>
+        <button id="toast-no-progress">Sem progresso</button>
+        <button id="toast-no-icon">Sem ícone</button>
+        <button id="toast-multiple">Múltiplos</button>
+    </div>
+
+    <h2>Popup</h2>
+
+    <div class="examples">
+        <button id="popup-success">Success</button>
+        <button id="popup-error">Error</button>
+        <button id="popup-warning">Warning</button>
+        <button id="popup-info">Info</button>
+    </div>
+
+    <h2>Popup — variações</h2>
+
+    <div class="examples">
+        <button id="popup-no-icon">Sem ícone</button>
+        <button id="popup-strict">Confirmação obrigatória</button>
+    </div>
+</main>
+
+<script
+    type="module"
+    src="/src/main.ts"
+></script>
 
 </body>
 </html>
