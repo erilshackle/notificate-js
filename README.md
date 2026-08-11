@@ -1,8 +1,8 @@
-# Notificate.js
+# Notificate
 
 Lightweight toast and popup notifications for the web.
 
-Notificate.js provides a small and dependency-free API for displaying toast notifications and confirmation popups with built-in TypeScript support, automatic light/dark appearance, SVG icons and Promise-based interactions.
+Notificate provides a small and dependency-free API for displaying toast notifications and confirmation popups with built-in TypeScript support, automatic light/dark appearance, SVG icons and Promise-based interactions.
 
 ## Features
 
@@ -24,7 +24,7 @@ Notificate.js provides a small and dependency-free API for displaying toast noti
 ## Installation
 
 ```bash
-npm install notificate.js
+npm install notificate
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ npm install notificate.js
 ### ES Modules
 
 ```ts
-import { Notificate } from 'notificate.js';
+import { Notificate } from 'notificate';
 
 Notificate.toast({
     title: 'Success',
@@ -45,7 +45,7 @@ No separate CSS import is required.
 
 ### Browser
 
-Notificate.js also provides a standalone UMD build for use without ES modules.
+Notificate also provides a standalone UMD build for use without ES modules.
 
 ```html
 <script src="notificate.umd.js"></script>
@@ -221,7 +221,7 @@ Notificate.toast({
 
 ## Appearance
 
-Notificate.js automatically follows the operating system's light or dark color scheme using `prefers-color-scheme`.
+Notificate automatically follows the operating system's light or dark color scheme using `prefers-color-scheme`.
 
 The library inherits the application's font family rather than loading or enforcing an external font.
 

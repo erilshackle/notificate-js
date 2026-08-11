@@ -1,13 +1,11 @@
 {
-    "name": "notificate.js",
+    "name": "notificate",
     "version": "0.1.0",
     "description": "Lightweight toast and popup notifications for the web.",
     "type": "module",
-
     "main": "./dist/notificate.js",
     "module": "./dist/notificate.js",
     "types": "./dist/index.d.ts",
-
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -16,22 +14,17 @@
         },
         "./umd": "./dist/notificate.umd.js"
     },
-
     "files": [
         "dist"
     ],
-
     "repository": {
         "type": "git",
         "url": "git+https://github.com/erilshackle/notificate.js.git"
     },
-
     "bugs": {
         "url": "https://github.com/erilshackle/notificate.js/issues"
     },
-
     "homepage": "https://erilshackle.github.io/notificate.js/",
-
     "keywords": [
         "toast",
         "notification",
@@ -43,9 +36,7 @@
         "typescript",
         "vite"
     ],
-
     "license": "MIT",
-
     "scripts": {
         "dev": "vite",
         "check": "tsc --noEmit",
@@ -55,7 +46,6 @@
         "build:demo": "vite build --config vite.demo.config.ts",
         "build": "npm run check && npm run build:es && npm run build:umd && npm run build:types"
     },
-
     "devDependencies": {
         "typescript": "^5.9.0",
         "vite": "^8.0.0"
