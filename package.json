@@ -1,29 +1,63 @@
 {
-    "name": "notificate",
+    "name": "notificate.js",
     "version": "0.1.0",
+    "description": "Lightweight toast and popup notifications for the web.",
     "type": "module",
-    "main": "./dist/notificate.umd.cjs",
+
+    "main": "./dist/notificate.js",
     "module": "./dist/notificate.js",
+    "types": "./dist/index.d.ts",
+
     "exports": {
         ".": {
+            "types": "./dist/index.d.ts",
             "import": "./dist/notificate.js",
-            "require": "./dist/notificate.umd.cjs"
-        }
+            "default": "./dist/notificate.js"
+        },
+        "./umd": "./dist/notificate.umd.js"
     },
+
     "files": [
         "dist"
     ],
+
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/erilshackle/notificate.js.git"
+    },
+
+    "bugs": {
+        "url": "https://github.com/erilshackle/notificate.js/issues"
+    },
+
+    "homepage": "https://erilshackle.github.io/notificate.js/",
+
+    "keywords": [
+        "toast",
+        "notification",
+        "notifications",
+        "popup",
+        "modal",
+        "alert",
+        "javascript",
+        "typescript",
+        "vite"
+    ],
+
+    "license": "MIT",
+
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
-        "check": "tsc --noEmit"
+        "check": "tsc --noEmit",
+        "build:es": "vite build",
+        "build:umd": "vite build --config vite.umd.config.ts",
+        "build:types": "tsc -p tsconfig.build.json",
+        "build:demo": "vite build --config vite.demo.config.ts",
+        "build": "npm run check && npm run build:es && npm run build:umd && npm run build:types"
     },
+
     "devDependencies": {
-        "@types/node": "^26.2.0",
-        "typescript": "^5",
-        "vite": "^8"
-    },
-    "dependencies": {
-        "path": "^0.12.7"
+        "typescript": "^5.9.0",
+        "vite": "^8.0.0"
     }
 }
