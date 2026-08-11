@@ -1,9 +1,10 @@
 import { toastDefaults } from '../defaults';
 import { getIcon } from '../icons';
-
 import type { ToastOptions } from '../types';
 
-export class Toast {
+import { Notification } from './Notification';
+
+export class Toast extends Notification {
     private readonly options: Required<
         Pick<
             ToastOptions,
@@ -27,13 +28,9 @@ export class Toast {
 
     private paused = false;
 
-    private resolveResult:
-        | ((result: boolean) => void)
-        | null = null;
-
-    private resolved = false;
-
     public constructor(options: ToastOptions = {}) {
+        super();
+
         this.options = {
             ...toastDefaults,
             ...options,
@@ -42,27 +39,21 @@ export class Toast {
         this.remainingDuration = this.options.duration;
     }
 
-    public show(): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            this.resolveResult = resolve;
-
-            this.render();
-            this.startTimeout();
-        });
+    /**
+     * Opens the toast.
+     */
+    protected open(): void {
+        this.render();
+        this.startTimeout();
     }
 
+    /**
+     * Renders the toast in the document.
+     */
     private render(): void {
         const container = this.getContainer();
 
         const toast = document.createElement('div');
-
-        toast.addEventListener('mouseenter', () => {
-            this.pauseTimeout();
-        });
-
-        toast.addEventListener('mouseleave', () => {
-            this.resumeTimeout();
-        });
 
         toast.className = [
             'notificate-toast',
@@ -100,12 +91,26 @@ export class Toast {
             toast.append(this.createProgress());
         }
 
+        toast.addEventListener(
+            'mouseenter',
+            this.handleMouseEnter,
+        );
+
+        toast.addEventListener(
+            'mouseleave',
+            this.handleMouseLeave,
+        );
+
         this.element = toast;
 
         container.append(toast);
+
         this.startProgress();
     }
 
+    /**
+     * Creates the notification icon.
+     */
     private createIcon(): HTMLElement {
         const icon = document.createElement('div');
 
@@ -120,6 +125,9 @@ export class Toast {
         return icon;
     }
 
+    /**
+     * Creates the main toast content.
+     */
     private createContent(): HTMLElement {
         const content = document.createElement('div');
 
@@ -146,6 +154,9 @@ export class Toast {
         return content;
     }
 
+    /**
+     * Creates the optional action button.
+     */
     private createActionButton(): HTMLButtonElement {
         const button = document.createElement('button');
 
@@ -160,6 +171,9 @@ export class Toast {
         return button;
     }
 
+    /**
+     * Creates the close button.
+     */
     private createCloseButton(): HTMLButtonElement {
         const button = document.createElement('button');
 
@@ -189,6 +203,9 @@ export class Toast {
         return button;
     }
 
+    /**
+     * Creates the progress indicator.
+     */
     private createProgress(): HTMLElement {
         const progress = document.createElement('div');
 
@@ -205,23 +222,9 @@ export class Toast {
         return progress;
     }
 
-    private startProgress(): void {
-        if (
-            !this.progressBar ||
-            !this.options.progress ||
-            this.options.duration <= 0
-        ) {
-            return;
-        }
-
-        this.progressBar.style.animation = [
-            'notificate-toast-progress',
-            `${this.options.duration}ms`,
-            'linear',
-            'forwards',
-        ].join(' ');
-    }
-
+    /**
+     * Starts the toast timeout.
+     */
     private startTimeout(): void {
         if (this.options.duration <= 0) {
             return;
@@ -232,6 +235,9 @@ export class Toast {
         this.scheduleTimeout();
     }
 
+    /**
+     * Schedules the current remaining timeout.
+     */
     private scheduleTimeout(): void {
         if (this.remainingDuration <= 0) {
             this.resolve(false);
@@ -246,6 +252,9 @@ export class Toast {
         }, this.remainingDuration);
     }
 
+    /**
+     * Pauses the toast timeout.
+     */
     private pauseTimeout(): void {
         if (
             this.paused ||
@@ -271,10 +280,12 @@ export class Toast {
         this.pauseProgress();
     }
 
+    /**
+     * Resumes the toast timeout.
+     */
     private resumeTimeout(): void {
         if (
             !this.paused ||
-            this.resolved ||
             this.options.duration <= 0
         ) {
             return;
@@ -286,57 +297,86 @@ export class Toast {
         this.scheduleTimeout();
     }
 
-    private pauseProgress(): void {
-        if (!this.progressBar) {
-            return;
+    /**
+     * Stops the active timeout.
+     */
+    private stopTimeout(): void {
+        if (this.timeoutId !== null) {
+            window.clearTimeout(this.timeoutId);
+
+            this.timeoutId = null;
         }
 
-        const style = window.getComputedStyle(this.progressBar);
-        const transform = style.transform;
-
-        this.progressBar.style.animation = 'none';
-        this.progressBar.style.transform = transform;
+        this.paused = false;
     }
 
-    private resumeProgress(): void {
-        if (!this.progressBar) {
+    /**
+     * Starts the visual progress animation.
+     */
+    private startProgress(): void {
+        if (
+            !this.progressBar ||
+            !this.options.progress ||
+            this.options.duration <= 0
+        ) {
             return;
         }
-
-        const scale = this.getProgressScale();
-
-        this.progressBar.style.transform = `scaleX(${scale})`;
 
         this.progressBar.style.animation = [
             'notificate-toast-progress',
-            `${this.remainingDuration}ms`,
+            `${this.options.duration}ms`,
             'linear',
             'forwards',
         ].join(' ');
     }
 
-    private stopTimeout(): void {
-        if (this.timeoutId === null) {
+    /**
+     * Pauses the progress animation.
+     */
+    private pauseProgress(): void {
+        if (!this.progressBar) {
             return;
         }
 
-        window.clearTimeout(this.timeoutId);
-
-        this.timeoutId = null;
+        this.progressBar.style.animationPlayState = 'paused';
     }
 
-    private resolve(result: boolean): void {
-        if (this.resolved) {
+    /**
+     * Resumes the progress animation.
+     */
+    private resumeProgress(): void {
+        if (!this.progressBar) {
             return;
         }
 
-        this.resolved = true;
+        this.progressBar.style.animationPlayState = 'running';
+    }
 
+    /**
+     * Handles mouse entering the toast.
+     */
+    private readonly handleMouseEnter = (): void => {
+        this.pauseTimeout();
+    };
+
+    /**
+     * Handles mouse leaving the toast.
+     */
+    private readonly handleMouseLeave = (): void => {
+        this.resumeTimeout();
+    };
+
+    /**
+     * Performs cleanup before closing.
+     */
+    protected override beforeClose(): void {
         this.stopTimeout();
-        this.close(result);
     }
 
-    private close(result: boolean): void {
+    /**
+     * Starts the toast closing transition.
+     */
+    protected close(result: boolean): void {
         if (!this.element) {
             this.finish(result);
 
@@ -347,12 +387,11 @@ export class Toast {
 
         toast.classList.add('is-closing');
 
-        const prefersReducedMotion =
-            window.matchMedia(
-                '(prefers-reduced-motion: reduce)',
-            ).matches;
+        const reducedMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        ).matches;
 
-        if (prefersReducedMotion) {
+        if (reducedMotion) {
             this.finish(result);
 
             return;
@@ -369,27 +408,33 @@ export class Toast {
         );
     }
 
-    private finish(result: boolean): void {
-        this.destroy();
+    /**
+     * Removes the toast and its listeners.
+     */
+    protected destroy(): void {
+        if (this.element) {
+            this.element.removeEventListener(
+                'mouseenter',
+                this.handleMouseEnter,
+            );
 
-        this.resolveResult?.(result);
+            this.element.removeEventListener(
+                'mouseleave',
+                this.handleMouseLeave,
+            );
 
-        this.resolveResult = null;
-    }
-
-    private destroy(): void {
-        this.element?.remove();
+            this.element.remove();
+        }
 
         this.element = null;
+        this.progressBar = null;
+
+        this.removeContainerIfEmpty();
     }
 
-    private getProgressScale(): number {
-        if (this.options.duration <= 0) {
-            return 0;
-        }
-        return this.remainingDuration / this.options.duration;
-    }
-
+    /**
+     * Returns the shared toast container.
+     */
     private getContainer(): HTMLElement {
         let container = document.querySelector<HTMLElement>(
             '.notificate-toast-container',
@@ -406,5 +451,21 @@ export class Toast {
         document.body.append(container);
 
         return container;
+    }
+
+    /**
+     * Removes the shared container when no toasts remain.
+     */
+    private removeContainerIfEmpty(): void {
+        const container = document.querySelector<HTMLElement>(
+            '.notificate-toast-container',
+        );
+
+        if (
+            container &&
+            container.childElementCount === 0
+        ) {
+            container.remove();
+        }
     }
 }

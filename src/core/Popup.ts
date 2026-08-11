@@ -3,7 +3,20 @@ import { getIcon } from '../icons';
 
 import type { PopupOptions } from '../types';
 
+
+let popupId = 0;
+
+function createPopupId(): string {
+    popupId += 1;
+
+    return `notificate-popup-${popupId}`;
+}
+
+
 export class Popup {
+
+    private readonly id = createPopupId();
+
     private readonly options: Required<
         Pick<
             PopupOptions,
@@ -19,7 +32,11 @@ export class Popup {
 
     private element: HTMLElement | null = null;
 
-    private resolveResult: ((result: boolean) => void) | null = null;
+    private previousActiveElement: HTMLElement | null = null;
+
+    private resolveResult:
+        | ((result: boolean) => void)
+        | null = null;
 
     private resolved = false;
 
@@ -34,9 +51,27 @@ export class Popup {
         return new Promise<boolean>((resolve) => {
             this.resolveResult = resolve;
 
+            this.previousActiveElement =
+                document.activeElement instanceof HTMLElement
+                    ? document.activeElement
+                    : null;
+
             this.render();
             this.bindEvents();
+            this.focus();
         });
+    }
+
+    private focus(): void {
+        const focusable = this.getFocusableElements();
+
+        if (focusable.length > 0) {
+            focusable[0].focus();
+
+            return;
+        }
+
+        this.element?.focus();
     }
 
     private render(): void {
@@ -46,10 +81,30 @@ export class Popup {
 
         const popup = document.createElement('div');
 
-        popup.className = `notificate-popup notificate-${this.options.type}`;
+        popup.className = [
+            'notificate-popup',
+            `notificate-${this.options.type}`,
+        ].join(' ');
+
+        popup.id = this.id;
 
         popup.setAttribute('role', 'dialog');
         popup.setAttribute('aria-modal', 'true');
+        popup.tabIndex = -1;
+
+        if (this.options.title) {
+            popup.setAttribute(
+                'aria-labelledby',
+                `${this.id}-title`,
+            );
+        }
+
+        if (this.options.message) {
+            popup.setAttribute(
+                'aria-describedby',
+                `${this.id}-message`,
+            );
+        }
 
         if (this.options.icon) {
             popup.append(this.createIcon());
@@ -91,6 +146,7 @@ export class Popup {
         if (this.options.title) {
             const title = document.createElement('div');
 
+            title.id = `${this.id}-title`;
             title.className = 'notificate-popup-title';
             title.textContent = this.options.title;
 
@@ -100,6 +156,7 @@ export class Popup {
         if (this.options.message) {
             const message = document.createElement('div');
 
+            message.id = `${this.id}-message`;
             message.className = 'notificate-popup-message';
             message.textContent = this.options.message;
 
@@ -117,46 +174,51 @@ export class Popup {
         actions.className = 'notificate-popup-actions';
 
         if (this.options.button) {
-            const cancel = document.createElement('button');
-
-            cancel.type = 'button';
-            cancel.className = 'notificate-popup-cancel';
-            cancel.textContent = 'Cancelar';
-
-            cancel.addEventListener('click', () => {
-                this.resolve(false);
-            });
-
-            actions.append(cancel);
-
-            const button = document.createElement('button');
-
-            button.type = 'button';
-            button.className = 'notificate-popup-button';
-            button.textContent = this.options.button;
-
-            button.addEventListener('click', () => {
-                this.resolve(true);
-            });
-
-            actions.append(button);
+            actions.append(
+                this.createCancelButton(),
+                this.createPrimaryButton(
+                    this.options.button,
+                ),
+            );
 
             return actions;
         }
 
+        actions.append(
+            this.createPrimaryButton('OK'),
+        );
+
+        return actions;
+    }
+
+    private createPrimaryButton(
+        label: string,
+    ): HTMLButtonElement {
         const button = document.createElement('button');
 
         button.type = 'button';
         button.className = 'notificate-popup-button';
-        button.textContent = 'OK';
+        button.textContent = label;
 
         button.addEventListener('click', () => {
             this.resolve(true);
         });
 
-        actions.append(button);
+        return button;
+    }
 
-        return actions;
+    private createCancelButton(): HTMLButtonElement {
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.className = 'notificate-popup-cancel';
+        button.textContent = 'Cancelar';
+
+        button.addEventListener('click', () => {
+            this.resolve(false);
+        });
+
+        return button;
     }
 
     private createCloseButton(): HTMLButtonElement {
@@ -165,7 +227,10 @@ export class Popup {
         button.type = 'button';
         button.className = 'notificate-popup-close';
 
-        button.setAttribute('aria-label', 'Fechar');
+        button.setAttribute(
+            'aria-label',
+            'Fechar',
+        );
 
         button.innerHTML = `
             <svg
@@ -186,6 +251,39 @@ export class Popup {
         });
 
         return button;
+    }
+
+    private getFocusableElements(): HTMLElement[] {
+        if (!this.element) {
+            return [];
+        }
+
+        const selector = [
+            'button:not([disabled])',
+            'a[href]',
+            'input:not([disabled])',
+            'select:not([disabled])',
+            'textarea:not([disabled])',
+            '[tabindex]:not([tabindex="-1"])',
+        ].join(',');
+
+        return Array.from(
+            this.element.querySelectorAll<HTMLElement>(selector),
+        ).filter((element) => {
+            return !element.hasAttribute('hidden');
+        });
+    }
+
+    private restoreFocus(): void {
+        if (!this.previousActiveElement) {
+            return;
+        }
+
+        if (document.contains(this.previousActiveElement)) {
+            this.previousActiveElement.focus();
+        }
+
+        this.previousActiveElement = null;
     }
 
     private bindEvents(): void {
@@ -219,12 +317,51 @@ export class Popup {
     private readonly handleKeydown = (
         event: KeyboardEvent,
     ): void => {
-        if (event.key !== 'Escape') {
+        if (event.key === 'Escape') {
+            this.resolve(false);
+
             return;
         }
 
-        this.resolve(false);
+        if (event.key === 'Tab') {
+            this.handleTab(event);
+        }
     };
+
+    private handleTab(event: KeyboardEvent): void {
+        const focusable = this.getFocusableElements();
+
+        if (focusable.length === 0) {
+            event.preventDefault();
+
+            this.element?.focus();
+
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (
+            event.shiftKey &&
+            document.activeElement === first
+        ) {
+            event.preventDefault();
+
+            last.focus();
+
+            return;
+        }
+
+        if (
+            !event.shiftKey &&
+            document.activeElement === last
+        ) {
+            event.preventDefault();
+
+            first.focus();
+        }
+    }
 
     private readonly handleBackdropClick = (
         event: MouseEvent,
@@ -244,7 +381,49 @@ export class Popup {
         this.resolved = true;
 
         this.unbindEvents();
+        this.close(result);
+    }
+
+    private close(result: boolean): void {
+        if (!this.backdrop) {
+            this.finish(result);
+
+            return;
+        }
+
+        const backdrop = this.backdrop;
+
+        backdrop.classList.add('is-closing');
+
+        const reducedMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        ).matches;
+
+        if (reducedMotion) {
+            this.finish(result);
+
+            return;
+        }
+
+        backdrop.addEventListener(
+            'animationend',
+            (event) => {
+                if (event.target !== backdrop) {
+                    return;
+                }
+
+                this.finish(result);
+            },
+            {
+                once: true,
+            },
+        );
+    }
+
+    private finish(result: boolean): void {
         this.destroy();
+
+        this.restoreFocus();
 
         this.resolveResult?.(result);
 
