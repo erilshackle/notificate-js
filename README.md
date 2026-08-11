@@ -1,4 +1,4 @@
-# Notificate
+# Notificate-js
 
 Lightweight toast and popup notifications for the web.
 

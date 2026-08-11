@@ -19,12 +19,12 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/erilshackle/notificate.js.git"
+        "url": "git+https://github.com/erilshackle/notificate-js.git"
     },
     "bugs": {
-        "url": "https://github.com/erilshackle/notificate.js/issues"
+        "url": "https://github.com/erilshackle/notificate-js/issues"
     },
-    "homepage": "https://erilshackle.github.io/notificate.js/",
+    "homepage": "https://erilshackle.github.io/notificate-js/",
     "keywords": [
         "toast",
         "notification",
@@ -47,6 +47,7 @@
         "build": "npm run check && npm run build:es && npm run build:umd && npm run build:types"
     },
     "devDependencies": {
+        "@types/node": "^26.2.0",
         "typescript": "^5.9.0",
         "vite": "^8.0.0"
     }

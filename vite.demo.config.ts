@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    base: '/notificate.js/',
+    base: '/notificate/',
 
     build: {
         outDir: 'demo-dist',
