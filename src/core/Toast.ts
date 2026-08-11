@@ -17,7 +17,15 @@ export class Toast {
 
     private element: HTMLElement | null = null;
 
+    private progressBar: HTMLElement | null = null;
+
     private timeoutId: number | null = null;
+
+    private startedAt = 0;
+
+    private remainingDuration = 0;
+
+    private paused = false;
 
     private resolveResult:
         | ((result: boolean) => void)
@@ -30,6 +38,8 @@ export class Toast {
             ...toastDefaults,
             ...options,
         };
+
+        this.remainingDuration = this.options.duration;
     }
 
     public show(): Promise<boolean> {
@@ -45,6 +55,14 @@ export class Toast {
         const container = this.getContainer();
 
         const toast = document.createElement('div');
+
+        toast.addEventListener('mouseenter', () => {
+            this.pauseTimeout();
+        });
+
+        toast.addEventListener('mouseleave', () => {
+            this.resumeTimeout();
+        });
 
         toast.className = [
             'notificate-toast',
@@ -85,6 +103,7 @@ export class Toast {
         this.element = toast;
 
         container.append(toast);
+        this.startProgress();
     }
 
     private createIcon(): HTMLElement {
@@ -179,9 +198,28 @@ export class Toast {
 
         bar.className = 'notificate-toast-progress-bar';
 
+        this.progressBar = bar;
+
         progress.append(bar);
 
         return progress;
+    }
+
+    private startProgress(): void {
+        if (
+            !this.progressBar ||
+            !this.options.progress ||
+            this.options.duration <= 0
+        ) {
+            return;
+        }
+
+        this.progressBar.style.animation = [
+            'notificate-toast-progress',
+            `${this.options.duration}ms`,
+            'linear',
+            'forwards',
+        ].join(' ');
     }
 
     private startTimeout(): void {
@@ -189,24 +227,92 @@ export class Toast {
             return;
         }
 
-        this.timeoutId = window.setTimeout(() => {
-            this.resolve(false);
-        }, this.options.duration);
+        this.remainingDuration = this.options.duration;
+
+        this.scheduleTimeout();
     }
 
-    private resolve(result: boolean): void {
-        if (this.resolved) {
+    private scheduleTimeout(): void {
+        if (this.remainingDuration <= 0) {
+            this.resolve(false);
+
             return;
         }
 
-        this.resolved = true;
+        this.startedAt = Date.now();
 
-        this.stopTimeout();
-        this.destroy();
+        this.timeoutId = window.setTimeout(() => {
+            this.resolve(false);
+        }, this.remainingDuration);
+    }
 
-        this.resolveResult?.(result);
+    private pauseTimeout(): void {
+        if (
+            this.paused ||
+            this.timeoutId === null ||
+            this.options.duration <= 0
+        ) {
+            return;
+        }
 
-        this.resolveResult = null;
+        this.paused = true;
+
+        const elapsed = Date.now() - this.startedAt;
+
+        this.remainingDuration = Math.max(
+            0,
+            this.remainingDuration - elapsed,
+        );
+
+        window.clearTimeout(this.timeoutId);
+
+        this.timeoutId = null;
+
+        this.pauseProgress();
+    }
+
+    private resumeTimeout(): void {
+        if (
+            !this.paused ||
+            this.resolved ||
+            this.options.duration <= 0
+        ) {
+            return;
+        }
+
+        this.paused = false;
+
+        this.resumeProgress();
+        this.scheduleTimeout();
+    }
+
+    private pauseProgress(): void {
+        if (!this.progressBar) {
+            return;
+        }
+
+        const style = window.getComputedStyle(this.progressBar);
+        const transform = style.transform;
+
+        this.progressBar.style.animation = 'none';
+        this.progressBar.style.transform = transform;
+    }
+
+    private resumeProgress(): void {
+        if (!this.progressBar) {
+            return;
+        }
+
+        const scale = this.getProgressScale();
+
+        this.progressBar.style.transform = `scaleX(${scale})`;
+
+        this.progressBar.style.animation = [
+            'notificate-toast-progress',
+            `${this.remainingDuration}ms`,
+            'linear',
+            'forwards',
+        ].join(' ');
     }
 
     private stopTimeout(): void {
@@ -219,10 +325,69 @@ export class Toast {
         this.timeoutId = null;
     }
 
+    private resolve(result: boolean): void {
+        if (this.resolved) {
+            return;
+        }
+
+        this.resolved = true;
+
+        this.stopTimeout();
+        this.close(result);
+    }
+
+    private close(result: boolean): void {
+        if (!this.element) {
+            this.finish(result);
+
+            return;
+        }
+
+        const toast = this.element;
+
+        toast.classList.add('is-closing');
+
+        const prefersReducedMotion =
+            window.matchMedia(
+                '(prefers-reduced-motion: reduce)',
+            ).matches;
+
+        if (prefersReducedMotion) {
+            this.finish(result);
+
+            return;
+        }
+
+        toast.addEventListener(
+            'animationend',
+            () => {
+                this.finish(result);
+            },
+            {
+                once: true,
+            },
+        );
+    }
+
+    private finish(result: boolean): void {
+        this.destroy();
+
+        this.resolveResult?.(result);
+
+        this.resolveResult = null;
+    }
+
     private destroy(): void {
         this.element?.remove();
 
         this.element = null;
+    }
+
+    private getProgressScale(): number {
+        if (this.options.duration <= 0) {
+            return 0;
+        }
+        return this.remainingDuration / this.options.duration;
     }
 
     private getContainer(): HTMLElement {
