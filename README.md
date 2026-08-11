@@ -27,6 +27,11 @@ Notificate provides a small and dependency-free API for displaying toast notific
 npm install notificate
 ```
 
+via cdn
+```html
+<script src="https://unpkg.com/notificate@0.1.0/dist/notificate.js"></script>
+```
+
 ## Usage
 
 ### ES Modules
