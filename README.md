@@ -27,9 +27,9 @@ Notificate provides a small and dependency-free API for displaying toast notific
 npm install notificate
 ```
 
-via cdn
+CDN
 ```html
-<script src="https://unpkg.com/notificate@0.1.0/dist/notificate.js"></script>
+<script src="https://unpkg.com/notificate@latest"></script>
 ```
 
 ## Usage
