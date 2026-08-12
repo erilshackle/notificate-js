@@ -1,6 +1,6 @@
 {
     "name": "notificate",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Lightweight toast and popup notifications for the web.",
     "type": "module",
     "main": "./dist/notificate.js",
