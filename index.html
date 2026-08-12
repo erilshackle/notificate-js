@@ -1,20 +1,15 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
 
-    <meta
-        name="description"
-        content="Notificate — lightweight toast and popup notifications for the web."
-    >
+    <meta name="description" content="Notificate — lightweight toast and popup notifications for the web.">
 
     <title>Notificate — Toast & Popup Notifications</title>
 
@@ -83,11 +78,9 @@
 
         .site-header {
             border-bottom: 1px solid var(--border);
-            background: color-mix(
-                in srgb,
-                var(--page-bg) 88%,
-                transparent
-            );
+            background: color-mix(in srgb,
+                    var(--page-bg) 88%,
+                    transparent);
         }
 
         .site-header-inner {
@@ -253,7 +246,7 @@
             padding-block: 42px;
         }
 
-        .section + .section {
+        .section+.section {
             border-top: 1px solid var(--border);
         }
 
@@ -368,6 +361,83 @@
             color: var(--text);
         }
 
+        .quick-start-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .code-example {
+            overflow: hidden;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background: var(--code-bg);
+            box-shadow: var(--shadow);
+        }
+
+        .code-example-header {
+            min-height: 46px;
+            padding: 0 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .code-example-header span {
+            color: #94a3b8;
+
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .copy-button {
+            padding: 5px 9px;
+
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 7px;
+
+            color: #cbd5e1;
+            background: transparent;
+
+            font-size: 0.75rem;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .code-example pre {
+            margin: 0;
+            padding: 18px;
+
+            overflow-x: auto;
+        }
+
+        .code-example code {
+            color: var(--code-text);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 0.82rem;
+            line-height: 1.7;
+
+            white-space: pre;
+        }
+
         @media (max-width: 720px) {
             .site-nav {
                 gap: 12px;
@@ -382,6 +452,10 @@
             }
 
             .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-start-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -413,263 +487,276 @@
 
 <body>
 
-<header class="site-header">
-    <div class="container site-header-inner">
-        <a
-            href="./"
-            class="brand"
-        >
-            Notificate<span>.js</span>
-        </a>
-
-        <nav class="site-nav">
-            <a href="#toast">
-                Toast
+    <header class="site-header">
+        <div class="container site-header-inner">
+            <a href="./" class="brand">
+                Notificate<span>.js</span>
             </a>
 
-            <a href="#popup">
-                Popup
-            </a>
+            <nav class="site-nav">
+                <a href="#quick-start">
+                    Quick Start
+                </a>
+                <a href="#toast">
+                    Toast
+                </a>
 
-            <a
-                class="optional-link"
-                href="https://www.npmjs.com/package/notificate"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                npm
-            </a>
+                <a href="#popup">
+                    Popup
+                </a>
 
-            <a
-                href="https://github.com/erilshackle/notificate-js"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                GitHub
-            </a>
-        </nav>
-    </div>
-</header>
+                <a class="optional-link" href="https://www.npmjs.com/package/notificate" target="_blank"
+                    rel="noopener noreferrer">
+                    npm
+                </a>
 
-<main class="container">
-
-    <section class="hero">
-        <div class="hero-badge">
-            v0.1.0
+                <a href="https://github.com/erilshackle/notificate-js" target="_blank" rel="noopener noreferrer">
+                    GitHub
+                </a>
+            </nav>
         </div>
+    </header>
 
-        <h1>
-            Simple notifications for the web.
-        </h1>
+    <main class="container">
 
-        <p>
-            Lightweight toast and popup notifications with built-in
-            TypeScript support, Promise-based interactions, automatic
-            light and dark mode, and no UI dependencies.
-        </p>
+        <section class="hero">
+            <div class="hero-badge">
+                v0.1.0
+            </div>
 
-        <div class="hero-actions">
-            <a
-                href="#toast"
-                class="button button-primary"
-            >
-                Try the demo
-            </a>
-
-            <a
-                href="https://github.com/erilshackle/notificate-js"
-                class="button"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                View on GitHub
-            </a>
-        </div>
-
-        <div class="install">
-            <code>npm install notificate</code>
-        </div>
-        <div class="install">
-            <code>
-                &lt;script src="https://unpkg.com/notificate@1.0.0"&gt;&lt;/script&gt;
-            </code>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="feature-grid">
-            <article class="feature-card">
-                <strong>Dependency-free</strong>
-
-                <span>
-                    No Bootstrap, icon library or UI framework required.
-                </span>
-            </article>
-
-            <article class="feature-card">
-                <strong>Promise-based</strong>
-
-                <span>
-                    Await toast actions and popup confirmations naturally.
-                </span>
-            </article>
-
-            <article class="feature-card">
-                <strong>Light & dark</strong>
-
-                <span>
-                    Automatically follows the user's preferred color scheme.
-                </span>
-            </article>
-        </div>
-    </section>
-
-    <section
-        id="toast"
-        class="section"
-    >
-        <div class="section-header">
-            <h2>Toast</h2>
+            <h1>
+                Simple notifications for the web.
+            </h1>
 
             <p>
-                Try each notification type.
+                Lightweight toast and popup notifications with built-in
+                TypeScript support, Promise-based interactions, automatic
+                light and dark mode, and no UI dependencies.
             </p>
+
+            <div class="hero-actions">
+                <a href="#toast" class="button button-primary">
+                    Try the demo
+                </a>
+
+                <a href="https://github.com/erilshackle/notificate-js" class="button" target="_blank"
+                    rel="noopener noreferrer">
+                    View on GitHub
+                </a>
+            </div>
+            <div class="install">
+                <code>npm install notificate</code>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <strong>Dependency-free</strong>
+
+                    <span>
+                        No Bootstrap, icon library or UI framework required.
+                    </span>
+                </article>
+
+                <article class="feature-card">
+                    <strong>Promise-based</strong>
+
+                    <span>
+                        Await toast actions and popup confirmations naturally.
+                    </span>
+                </article>
+
+                <article class="feature-card">
+                    <strong>Light & dark</strong>
+
+                    <span>
+                        Automatically follows the user's preferred color scheme.
+                    </span>
+                </article>
+            </div>
+        </section>
+
+        <section id="quick-start" class="section">
+            <div class="section-header">
+                <h2>Quick start</h2>
+
+                <p>
+                    Copy, paste and start using Notificate.
+                </p>
+            </div>
+
+            <div class="quick-start-grid">
+                <article class="code-example">
+                    <div class="code-example-header">
+                        <span>Browser</span>
+
+                        <button type="button" class="copy-button" data-copy="browser-example">
+                            Copy
+                        </button>
+                    </div>
+
+                    <pre><code id="browser-example">&lt;script src="https://unpkg.com/notificate@1"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+    Notificate.toast({
+        title: 'Success',
+        message: 'Operation completed successfully.',
+        type: 'success'
+    });
+&lt;/script&gt;</code></pre>
+                </article>
+
+                <article class="code-example">
+                    <div class="code-example-header">
+                        <span>npm</span>
+
+                        <button type="button" class="copy-button" data-copy="npm-example">
+                            Copy
+                        </button>
+                    </div>
+
+                    <pre><code id="npm-example">import { Notificate } from 'notificate';
+
+Notificate.toast({
+    title: 'Success',
+    message: 'Operation completed successfully.',
+    type: 'success',
+});</code></pre>
+                </article>
+            </div>
+        </section>
+
+        <section id="toast" class="section">
+            <div class="section-header">
+                <h2>Toast</h2>
+
+                <p>
+                    Try each notification type.
+                </p>
+            </div>
+
+            <div class="examples">
+                <button id="toast-success">
+                    Success
+                </button>
+
+                <button id="toast-error">
+                    Error
+                </button>
+
+                <button id="toast-warning">
+                    Warning
+                </button>
+
+                <button id="toast-info">
+                    Info
+                </button>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Toast variations</h2>
+
+                <p>
+                    Actions, persistence, progress and icon options.
+                </p>
+            </div>
+
+            <div class="examples">
+                <button id="toast-action">
+                    With action
+                </button>
+
+                <button id="toast-persistent">
+                    Persistent
+                </button>
+
+                <button id="toast-no-progress">
+                    No progress
+                </button>
+
+                <button id="toast-no-icon">
+                    No icon
+                </button>
+
+                <button id="toast-multiple">
+                    Multiple
+                </button>
+            </div>
+        </section>
+
+        <section id="popup" class="section">
+            <div class="section-header">
+                <h2>Popup</h2>
+
+                <p>
+                    Confirmation dialogs using the same notification types.
+                </p>
+            </div>
+
+            <div class="examples">
+                <button id="popup-success">
+                    Success
+                </button>
+
+                <button id="popup-error">
+                    Error
+                </button>
+
+                <button id="popup-warning">
+                    Warning
+                </button>
+
+                <button id="popup-info">
+                    Info
+                </button>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Popup variations</h2>
+
+                <p>
+                    Test different interaction and dismissal modes.
+                </p>
+            </div>
+
+            <div class="examples">
+                <button id="popup-no-icon">
+                    No icon
+                </button>
+
+                <button id="popup-strict">
+                    Required confirmation
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <span>
+                MIT License · Copyright (c) 2026 Eril TS Carvalho
+            </span>
+
+            <div class="footer-links">
+                <a href="https://github.com/erilshackle/notificate-js" target="_blank" rel="noopener noreferrer">
+                    GitHub
+                </a>
+
+                <a href="https://www.npmjs.com/package/notificate" target="_blank" rel="noopener noreferrer">
+                    npm
+                </a>
+            </div>
         </div>
+    </footer>
 
-        <div class="examples">
-            <button id="toast-success">
-                Success
-            </button>
-
-            <button id="toast-error">
-                Error
-            </button>
-
-            <button id="toast-warning">
-                Warning
-            </button>
-
-            <button id="toast-info">
-                Info
-            </button>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2>Toast variations</h2>
-
-            <p>
-                Actions, persistence, progress and icon options.
-            </p>
-        </div>
-
-        <div class="examples">
-            <button id="toast-action">
-                With action
-            </button>
-
-            <button id="toast-persistent">
-                Persistent
-            </button>
-
-            <button id="toast-no-progress">
-                No progress
-            </button>
-
-            <button id="toast-no-icon">
-                No icon
-            </button>
-
-            <button id="toast-multiple">
-                Multiple
-            </button>
-        </div>
-    </section>
-
-    <section
-        id="popup"
-        class="section"
-    >
-        <div class="section-header">
-            <h2>Popup</h2>
-
-            <p>
-                Confirmation dialogs using the same notification types.
-            </p>
-        </div>
-
-        <div class="examples">
-            <button id="popup-success">
-                Success
-            </button>
-
-            <button id="popup-error">
-                Error
-            </button>
-
-            <button id="popup-warning">
-                Warning
-            </button>
-
-            <button id="popup-info">
-                Info
-            </button>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2>Popup variations</h2>
-
-            <p>
-                Test different interaction and dismissal modes.
-            </p>
-        </div>
-
-        <div class="examples">
-            <button id="popup-no-icon">
-                No icon
-            </button>
-
-            <button id="popup-strict">
-                Required confirmation
-            </button>
-        </div>
-    </section>
-
-</main>
-
-<footer class="footer">
-    <div class="container footer-inner">
-        <span>
-            Notificate · MIT License
-        </span>
-
-        <div class="footer-links">
-            <a
-                href="https://github.com/erilshackle/notificate-js"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                GitHub
-            </a>
-
-            <a
-                href="https://www.npmjs.com/package/notificate"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                npm
-            </a>
-        </div>
-    </div>
-</footer>
-
-<script
-    type="module"
-    src="/demo/main.ts"
-></script>
+    <script type="module" src="/demo/main.ts"></script>
 
 </body>
+
 </html>

@@ -232,3 +232,36 @@ element('popup-strict')?.addEventListener('click', async () => {
 
     console.log('Strict popup:', result);
 });
+
+document.querySelectorAll<HTMLButtonElement>('[data-copy]')
+    .forEach((button) => {
+        button.addEventListener('click', async () => {
+            const targetId = button.dataset.copy;
+
+            if (!targetId) {
+                return;
+            }
+
+            const target = document.getElementById(targetId);
+
+            if (!target) {
+                return;
+            }
+
+            const text = target.textContent ?? '';
+
+            try {
+                await navigator.clipboard.writeText(text);
+
+                const originalText = button.textContent;
+
+                button.textContent = 'Copied!';
+
+                window.setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1500);
+            } catch {
+                button.textContent = 'Failed';
+            }
+        });
+    });
